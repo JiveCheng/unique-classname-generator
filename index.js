@@ -11,16 +11,19 @@ var Module = function(opts) {
 		hasClassName: function(prefix, classname) {return self.queryHasSameClassName.call(self,prefix, classname)}
 	}
 	this.create = {
-		category: function(prefix, description){self.createCategory.call(self, prefix, description)},
-		classname: function(prefix, custom){self.createClassName.call(self, prefix, custom)}
+		category: function(prefix, description){return self.createCategory.call(self, prefix, description)},
+		classname: function(prefix, joiner, custom){return self.createClassName.call(self, prefix, joiner, custom)}
 	};
 };
-
 Module.prototype.queryCategory = function() {
 	var _categoriesDB = db.categories.find();
 	return _categoriesDB;
 };
 Module.prototype.queryPrefixList = function() {
+	var _categoriesDB = db.categories.find();
+	var array = _categoriesDB.map(function(obj) {
+		return obj.prefix;
+	});
 	return array;
 };
 Module.prototype.queryHasSamePrefix = function(prefix) {
@@ -36,7 +39,9 @@ Module.prototype.queryHasSameClassName = function(prefix, classname) {
 		searchResult = db.classname.find({"classname": classname,"prefix": prefix}),
 		i = 0;
 	while (function(obj){
-		if ( obj.classname == classname && obj.prefix == prefix ) {
+		if (searchResult.length == 0) {
+			return false;
+		} else if ( obj.classname == classname && obj.prefix == prefix ) {
 			truefalse = true
 			return false;
 		} else {
@@ -57,7 +62,7 @@ Module.prototype.createCategory = function(prefix, description) {
 		return db.categories.save({ "prefix": prefix, "description": description, "date": new Date().toLocaleString('zh-TW') });		
 	}
 };
-Module.prototype.createClassName = function(prefix, custom) {
+Module.prototype.createClassName = function(prefix, joiner, custom) {
 	var randomString = function (length) {
 		var rn,
 		rnd = '',
@@ -67,21 +72,25 @@ Module.prototype.createClassName = function(prefix, custom) {
 			 rnd += randomChars.substring(rn = Math.floor(Math.random() * randomChars.length), rn + 1);
 		}
 		return rnd;
-	}, self = this,
-	classname = custom || randomString();
-	if (!!custom) {
-		if (self.queryHasSameClassName(prefix, classname)) {
+	},
+	self = this,
+	classname = !!custom ? custom : randomString(),
+	jer = joiner || '_';
+	if (this.queryHasSamePrefix(prefix).length === 0) {
+		console.log("Please create category name first!");
+	} else if (!!custom) {
+		if (this.queryHasSameClassName(prefix, classname)) {
 			console.error("Please change the classname!");
 			return false;
 		} else {
 			console.log('no has same classname: ' + classname);
-			return db.classname.save({ "classname": classname, "prefix": prefix});
+			return db.classname.save({ "classname": classname, "prefix": prefix, "joiner": jer});
 		}
 	} else {
 		while (this.queryHasSameClassName(prefix, classname)) {
 			classname = randomString(4);
 		}
-		return db.classname.save({ "classname": classname, "prefix": prefix});
+		return db.classname.save({ "classname": classname, "prefix": prefix, "joiner": jer});
 	}
 };
 module.exports = Module;
