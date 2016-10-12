@@ -1,4 +1,3 @@
-'use strict';
 var db = require('diskdb');
 
 var Module = function(opts) {
@@ -9,7 +8,7 @@ var Module = function(opts) {
 		prefixList: function() {return self.queryPrefixList.call(self)},
 		hasPrefix: function(prefix) {return self.queryHasSamePrefix.call(self, prefix)},
 		hasClassName: function(prefix, classname) {return self.queryHasSameClassName.call(self,prefix, classname)}
-	}
+	};
 	this.create = {
 		category: function(prefix, description){return self.createCategory.call(self, prefix, description)},
 		classname: function(prefix, joiner, custom){return self.createClassName.call(self, prefix, joiner, custom)}
@@ -38,21 +37,21 @@ Module.prototype.queryHasSameClassName = function(prefix, classname) {
 	var truefalse = false,
 		searchResult = db.classname.find({"classname": classname,"prefix": prefix}),
 		i = 0;
-	while (function(obj){
+	while( function(obj){
 		if (searchResult.length == 0) {
 			return false;
 		} else if ( obj.classname == classname && obj.prefix == prefix ) {
-			truefalse = true
+			truefalse = true;
 			return false;
 		} else {
 			return true;
 		}
-	}(searchResult[i]) ) {
+	}(searchResult[i]) ){
 		if(i == searchResult.length-1) { 
 			break;
-		};
+		}
 		i < searchResult.length-1 && i++;
-	};
+	}
 	return truefalse;
 };
 Module.prototype.createCategory = function(prefix, description) {
