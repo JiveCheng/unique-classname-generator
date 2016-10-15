@@ -92,4 +92,6 @@ Module.prototype.createClassName = function(prefix, joiner, custom) {
 		return db.classname.save({ "classname": classname, "prefix": prefix, "joiner": jer});
 	}
 };
-module.exports = Module;
+if (typeof module !== "undefined" && module.exports) {
+	module.exports = new Module();
+}
