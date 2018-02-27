@@ -26,7 +26,7 @@ Module.prototype.queryPrefixList = function() {
 	return array;
 };
 Module.prototype.queryHasSamePrefix = function(prefix) {
-	var searchResult = db.classname.find({"prefix": prefix});
+	var searchResult = db.categories.find({"prefix": prefix});
 	if (searchResult.length == 0) {
 		return false;
 	} else {
@@ -93,5 +93,5 @@ Module.prototype.createClassName = function(prefix, joiner, custom) {
 	}
 };
 if (typeof module !== "undefined" && module.exports) {
-	module.exports = new Module();
+	module.exports = Module;
 }
